@@ -39,7 +39,7 @@ def extract_netstat_output(text):
     for line in text.split('\n'):
         if line.strip().startswith('TCP') or line.strip().startswith('UDP'):
             pid = line.split(' ')[-1].strip()
-            netstat_output.append({'pid': pid, 'line': line})
+            netstat_output.append({'pid': pid, 'line': line.strip()})
     return netstat_output
 
 
