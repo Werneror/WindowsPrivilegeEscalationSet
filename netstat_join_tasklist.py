@@ -3,11 +3,12 @@ Title: netstat_join_tasklist.py
 Date: September 28, 2019
 Author: Werner <me@werner.wiki>
 Homepage: https://blog.werner.wiki/
+Verify: Windows Server 2003, Windows 7, Windows 10
 
 Check the process name corresponding to each port when there is no netstat `-b` permission.
 
 Usage:
-    netstat -anto > temp.txt
+    netstat -ano > temp.txt
     tasklist /V /fo csv >> temp.txt
     python netstat_join_tasklist.py temp.txt
     del temp.txt
@@ -20,7 +21,7 @@ import sys
 
 def print_usage():
     print("""Usage:
-    netstat -anto > temp.txt
+    netstat -ano > temp.txt
     tasklist /V /fo csv >> temp.txt
     python netstat_join_tasklist.py temp.txt
     del temp.txt""")
@@ -29,15 +30,15 @@ def print_usage():
 def extract_netstat_output(text):
     """
     Example input:
-  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING       4124\tInHost
-  TCP    0.0.0.0:49679          0.0.0.0:0              LISTENING       952\tInHost
-  UDP    0.0.0.0:68             *:*                                    2220\t
-  UDP    0.0.0.0:500            *:*                                    4616\t
+  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING       4124
+  TCP    0.0.0.0:49679          0.0.0.0:0              LISTENING       952
+  UDP    0.0.0.0:68             *:*                                    2220
+  UDP    0.0.0.0:500            *:*                                    4616
     """
     netstat_output = list()
     for line in text.split('\n'):
         if line.strip().startswith('TCP') or line.strip().startswith('UDP'):
-            pid = line.split('\t')[0].split(' ')[-1]
+            pid = line.split(' ')[-1].strip()
             netstat_output.append({'pid': pid, 'line': line})
     return netstat_output
 
@@ -56,7 +57,7 @@ def extract_tasklist_output(text):
     for line in text.split('\n'):
         if line.strip().startswith('"'):
             split_result = line[1:].split('","')
-            pid = split_result[1]
+            pid = split_result[1].strip()
             # If you want to modify the output column, change it here.
             output_line = '\t'.join([split_result[0], split_result[6]])
             tasklist_output.append({'pid': pid, 'line': output_line})
